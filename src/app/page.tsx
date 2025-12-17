@@ -1,6 +1,6 @@
 "use client";
 import { useState, useRef, useEffect } from 'react';
-import { FiHeart, FiSearch, FiX, FiClock, FiShoppingCart, FiBell, FiUser, FiEdit2, FiMapPin, FiCreditCard, FiSettings, FiUserPlus, FiShield } from 'react-icons/fi';
+import { FiHeart, FiSearch, FiClock, FiShoppingCart, FiBell, FiUser, FiEdit2, FiMapPin, FiCreditCard, FiSettings, FiUserPlus, FiShield, FiMessageSquare } from 'react-icons/fi';
 import { AiOutlineHome } from 'react-icons/ai';
 
 type Product = {
@@ -186,6 +186,7 @@ export default function Home() {
   const [showAddressModal, setShowAddressModal] = useState(false);
   const [showCardModal, setShowCardModal] = useState(false);
   const [showAddCardForm, setShowAddCardForm] = useState(false);
+  const [showSmsModal, setShowSmsModal] = useState(false);
   
   // User Data State
   const [isLoggedIn, setIsLoggedIn] = useState(true);
@@ -194,6 +195,14 @@ export default function Home() {
   const [firstName, setFirstName] = useState("Eşref");
   const [lastName, setLastName] = useState("Erbek");
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const [smsNotificationsEnabled, setSmsNotificationsEnabled] = useState(false);
+  const [smsSettings, setSmsSettings] = useState({
+    auctionEnding: true,
+    bidWon: true,
+    orderStatus: true,
+    paymentReminder: true,
+    newProducts: false,
+  });
   const [selectedCargos, setSelectedCargos] = useState<string[]>([]);
   const [addressInfo, setAddressInfo] = useState<AddressInfo>({
     firstName: "Eşref",
@@ -810,6 +819,26 @@ export default function Home() {
                 </div>
               </label>
             </div>
+            <button 
+              className="flex items-center bg-[#222] rounded-xl px-4 py-3 font-semibold text-base mb-1 justify-between w-full text-left"
+              onClick={() => setShowSmsModal(true)}
+            >
+              <span className="flex items-center">
+                <FiMessageSquare className="mr-3 text-xl text-gray-400" />
+                SMS Bildirimleri
+              </span>
+              <label className="inline-flex items-center cursor-pointer ml-2" onClick={(e) => e.stopPropagation()}>
+                <input
+                  type="checkbox"
+                  checked={smsNotificationsEnabled}
+                  onChange={() => setSmsNotificationsEnabled(v => !v)}
+                  className="sr-only peer"
+                />
+                <div className="w-10 h-6 bg-gray-600 rounded-full peer peer-checked:bg-[#5856D6] transition-all relative">
+                  <div className={`absolute left-1 top-1 w-4 h-4 bg-white rounded-full shadow transition-all ${smsNotificationsEnabled ? "translate-x-4" : ""}`}></div>
+                </div>
+              </label>
+            </button>
             <div className="flex items-center bg-[#222] rounded-xl px-4 py-3 font-semibold text-base mb-1 justify-between">
               <span className="flex items-center">
                 <FiSettings className="mr-3 text-xl text-gray-400" />
@@ -1113,6 +1142,115 @@ export default function Home() {
               onClick={handleSaveCard}
             >
               Kartı Kaydet
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* SMS Settings Modal */}
+      {showSmsModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50">
+          <div className="bg-black rounded-xl p-6 w-[95vw] max-w-md relative text-white">
+            <button
+              className="absolute top-2 left-3 text-white text-2xl"
+              onClick={() => setShowSmsModal(false)}
+            >
+              {'<'}
+            </button>
+            <div className="text-center text-xl font-bold mb-4">SMS Bildirim Ayarları</div>
+            
+            <div className="mb-4">
+              <div className="text-sm text-gray-300 mb-4">
+                Önemli anlarda seni SMS ile bilgilendirmemizi ister misin? Hangi durumlarda SMS almak istediğini seç.
+              </div>
+              
+              <div className="flex flex-col gap-3">
+                <div className="flex items-center justify-between bg-[#222] rounded-lg px-4 py-3">
+                  <span className="text-base">Mezat bitiş uyarısı</span>
+                  <label className="inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={smsSettings.auctionEnding}
+                      onChange={() => setSmsSettings({...smsSettings, auctionEnding: !smsSettings.auctionEnding})}
+                      className="sr-only peer"
+                    />
+                    <div className="w-10 h-6 bg-gray-600 rounded-full peer peer-checked:bg-[#5856D6] transition-all relative">
+                      <div className={`absolute left-1 top-1 w-4 h-4 bg-white rounded-full shadow transition-all ${smsSettings.auctionEnding ? "translate-x-4" : ""}`}></div>
+                    </div>
+                  </label>
+                </div>
+                
+                <div className="flex items-center justify-between bg-[#222] rounded-lg px-4 py-3">
+                  <span className="text-base">Teklif kazanma</span>
+                  <label className="inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={smsSettings.bidWon}
+                      onChange={() => setSmsSettings({...smsSettings, bidWon: !smsSettings.bidWon})}
+                      className="sr-only peer"
+                    />
+                    <div className="w-10 h-6 bg-gray-600 rounded-full peer peer-checked:bg-[#5856D6] transition-all relative">
+                      <div className={`absolute left-1 top-1 w-4 h-4 bg-white rounded-full shadow transition-all ${smsSettings.bidWon ? "translate-x-4" : ""}`}></div>
+                    </div>
+                  </label>
+                </div>
+                
+                <div className="flex items-center justify-between bg-[#222] rounded-lg px-4 py-3">
+                  <span className="text-base">Sipariş durumu</span>
+                  <label className="inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={smsSettings.orderStatus}
+                      onChange={() => setSmsSettings({...smsSettings, orderStatus: !smsSettings.orderStatus})}
+                      className="sr-only peer"
+                    />
+                    <div className="w-10 h-6 bg-gray-600 rounded-full peer peer-checked:bg-[#5856D6] transition-all relative">
+                      <div className={`absolute left-1 top-1 w-4 h-4 bg-white rounded-full shadow transition-all ${smsSettings.orderStatus ? "translate-x-4" : ""}`}></div>
+                    </div>
+                  </label>
+                </div>
+                
+                <div className="flex items-center justify-between bg-[#222] rounded-lg px-4 py-3">
+                  <span className="text-base">Ödeme hatırlatması</span>
+                  <label className="inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={smsSettings.paymentReminder}
+                      onChange={() => setSmsSettings({...smsSettings, paymentReminder: !smsSettings.paymentReminder})}
+                      className="sr-only peer"
+                    />
+                    <div className="w-10 h-6 bg-gray-600 rounded-full peer peer-checked:bg-[#5856D6] transition-all relative">
+                      <div className={`absolute left-1 top-1 w-4 h-4 bg-white rounded-full shadow transition-all ${smsSettings.paymentReminder ? "translate-x-4" : ""}`}></div>
+                    </div>
+                  </label>
+                </div>
+                
+                <div className="flex items-center justify-between bg-[#222] rounded-lg px-4 py-3">
+                  <span className="text-base">Yeni ürün bildirimi</span>
+                  <label className="inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={smsSettings.newProducts}
+                      onChange={() => setSmsSettings({...smsSettings, newProducts: !smsSettings.newProducts})}
+                      className="sr-only peer"
+                    />
+                    <div className="w-10 h-6 bg-gray-600 rounded-full peer peer-checked:bg-[#5856D6] transition-all relative">
+                      <div className={`absolute left-1 top-1 w-4 h-4 bg-white rounded-full shadow transition-all ${smsSettings.newProducts ? "translate-x-4" : ""}`}></div>
+                    </div>
+                  </label>
+                </div>
+              </div>
+              
+              <div className="text-xs text-gray-400 mt-4">
+                📱 SMS'ler +905462306800 numarasına gönderilecektir.
+              </div>
+            </div>
+            
+            <button
+              className="w-full bg-[#FFD600] text-black font-bold rounded-xl py-3 text-lg"
+              onClick={() => setShowSmsModal(false)}
+            >
+              Kaydet
             </button>
           </div>
         </div>
